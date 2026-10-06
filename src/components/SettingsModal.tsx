@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Profile } from '../types/database';
-import { X, Save, AlertCircle, Settings as SettingsIcon, Loader2 } from 'lucide-react';
+import { X, Save, AlertCircle, Settings as SettingsIcon, Loader2, Download, Smartphone } from 'lucide-react';
 
 interface SettingsModalProps {
   isOpen: boolean;
   profile: Profile | null;
   onClose: () => void;
   onSaveProfile: (updates: Partial<Profile>) => Promise<{ success: boolean; error: string | null }>;
+  isInstallable?: boolean;
+  isStandalone?: boolean;
+  isIOS?: boolean;
+  onPromptInstall?: () => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -14,6 +18,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   profile,
   onClose,
   onSaveProfile,
+  isInstallable = false,
+  isStandalone = false,
+  isIOS = false,
+  onPromptInstall,
 }) => {
   const [name, setName] = useState<string>('');
   const [borrowedAmount, setBorrowedAmount] = useState<number>(6000);
@@ -75,10 +83,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
             <div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                Loan Settings
+                Loan Settings & App
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Update your total debt parameters & profile
+                Update loan parameters & application preferences
               </p>
             </div>
           </div>
@@ -96,6 +104,47 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-800 flex items-start gap-2.5 text-xs text-red-700 dark:text-red-300">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-600 dark:text-red-400" />
               <span>{errorMessage}</span>
+            </div>
+          )}
+
+          {/* PWA Install Banner inside Settings */}
+          {!isStandalone && (isInstallable || isIOS) && (
+            <div className="p-3.5 rounded-xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900/80 space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-blue-600 text-white shrink-0">
+                    <Download className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                      Install REPAY Application
+                    </h4>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Add to your home screen for instant access
+                    </p>
+                  </div>
+                </div>
+
+                {isInstallable && onPromptInstall && (
+                  <button
+                    type="button"
+                    onClick={onPromptInstall}
+                    className="px-3 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors shrink-0 flex items-center gap-1"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    Install
+                  </button>
+                )}
+              </div>
+
+              {isIOS && (
+                <div className="text-[11px] text-slate-700 dark:text-slate-300 bg-white/80 dark:bg-slate-900/80 p-2.5 rounded-lg border border-blue-100 dark:border-blue-900/60 flex items-start gap-2">
+                  <Smartphone className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                  <span>
+                    <strong>To install on iPhone/iPad:</strong> Tap <strong>Share</strong> in Safari, then select <strong>Add to Home Screen</strong>.
+                  </span>
+                </div>
+              )}
             </div>
           )}
 

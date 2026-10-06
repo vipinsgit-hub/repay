@@ -1,5 +1,5 @@
 import React from 'react';
-import { LogOut, Settings, Wallet, Calendar, PieChart, Sun, Moon } from 'lucide-react';
+import { LogOut, Settings, Wallet, Calendar, PieChart, Sun, Moon, Download } from 'lucide-react';
 
 interface HeaderProps {
   userName: string | null;
@@ -10,6 +10,9 @@ interface HeaderProps {
   onToggleTheme: () => void;
   onOpenSettings: () => void;
   onLogout: () => void;
+  isInstallable?: boolean;
+  isStandalone?: boolean;
+  onPromptInstall?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -21,6 +24,9 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleTheme,
   onOpenSettings,
   onLogout,
+  isInstallable = false,
+  isStandalone = false,
+  onPromptInstall,
 }) => {
   const displayName = userName || userEmail?.split('@')[0] || 'User';
   const initial = displayName.charAt(0).toUpperCase();
@@ -70,6 +76,18 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Right Actions & Controls */}
         <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          {/* PWA Install Button Header integration when installable */}
+          {isInstallable && !isStandalone && onPromptInstall && (
+            <button
+              onClick={onPromptInstall}
+              className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors"
+              title="Install REPAY App"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Install</span>
+            </button>
+          )}
+
           {/* Theme Toggle Button */}
           <button
             onClick={onToggleTheme}

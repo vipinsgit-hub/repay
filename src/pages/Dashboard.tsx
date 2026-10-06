@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { useProfile } from '../hooks/useProfile';
 import { usePayments } from '../hooks/usePayments';
+import { usePWA } from '../hooks/usePWA';
 import { calculateFinancials } from '../lib/calculations';
 import { Header } from '../components/Header';
 import { BalanceHero } from '../components/BalanceHero';
@@ -43,6 +44,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
     deletePayment,
   } = usePayments(user.id);
 
+  const { isInstallable, isStandalone, isIOS, promptInstall } = usePWA();
+
   // Modal states
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedPayment, setSelectedPayment] = useState<Payment | undefined>(
@@ -69,7 +72,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   return (
     <div className="min-h-screen bg-[#F7F8FA] dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 flex flex-col pb-12 transition-colors duration-200 overflow-x-hidden">
-      {/* Header with Navigation & Theme Toggle */}
+      {/* Header with Navigation, Theme Toggle, and PWA Install */}
       <Header
         userName={profile?.name || null}
         userEmail={user.email}
@@ -79,6 +82,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
         onToggleTheme={onToggleTheme}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onLogout={onLogout}
+        isInstallable={isInstallable}
+        isStandalone={isStandalone}
+        onPromptInstall={promptInstall}
       />
 
       {/* Main Content Area */}
@@ -147,12 +153,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
         }}
       />
 
-      {/* Settings Modal */}
+      {/* Settings Modal with PWA install options */}
       <SettingsModal
         isOpen={isSettingsOpen}
         profile={profile}
         onClose={() => setIsSettingsOpen(false)}
         onSaveProfile={updateProfile}
+        isInstallable={isInstallable}
+        isStandalone={isStandalone}
+        isIOS={isIOS}
+        onPromptInstall={promptInstall}
       />
     </div>
   );
